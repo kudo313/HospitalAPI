@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Body
 from fastapi.encoders import jsonable_encoder
 
-from app import patient as pt
-from app import patientDB
+import patient as pt
+import patientDB
 
 router = APIRouter()
 

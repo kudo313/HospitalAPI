@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from app import patientRoutes
+import patientRoutes
 
 app = FastAPI()
 app.include_router(patientRoutes.router, tags=["Patient"], prefix="/patient")
