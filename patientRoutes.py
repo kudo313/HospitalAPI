@@ -1,13 +1,61 @@
 from fastapi import APIRouter, Body
 from fastapi.encoders import jsonable_encoder
-
+import datetime
 import patient as pt
 import patientDB
+import apartmentCalendar as ap
+import apartmentDB
 
 router = APIRouter()
 
-@router.post("/", response_description="Patient data added into the database")
+@router.post("/patient/{apartment_name}", response_description="Patient data added into the database")
 async def add_student_data(patient: pt.PatientSchema = Body(...)):
     patient = jsonable_encoder(patient)
-    new_patient = await patientDB.add_patient(patient)
-    return pt.ResponseModel(new_patient, "Patient added successfully.")
+    updateStatus = False
+    apartment = await apartmentDB.get_apartment(patient["apartmentName"])
+    for dateIndex in range(len(apartment["dateCalendars"])):
+        date = apartment["dateCalendars"][dateIndex]
+        if date["date"] == patient["appointmentDate"]:
+            break
+    apartment["dateCalendars"][dateIndex]["startTimes"].append(patient["startAppointmentTime"])
+    updateStatus = await apartmentDB.update_apartment(apartment)
+    if updateStatus:
+        new_patient = await patientDB.add_patient(patient)
+        return pt.ResponseModel(new_patient, "Patient added successfully.")
+    else:
+        return "Can't update apartment calendar"
+
+@router.post("/apartment", response_description="Apartment data added into the database")
+async def add_apartment_data(apartment: ap.ApartmentCalendarSchema = Body(...)):
+    apartment = jsonable_encoder(apartment)
+    new_apartment= await apartmentDB.add_apartment(apartment)
+    return pt.ResponseModel(new_apartment, "Apartment added successfully.")
+
+@router.get("/apartment/{name}", response_description="get apartment from the database")
+async def get_all(name):
+    return await apartmentDB.get_lis_free_appartment(name)
+
+@router.get("/apartment/{name}/{date_order}/{month_order}/{year_order}", response_description=" get free calendar in a day")
+async def get_free_calendar(name, date_order, month_order, year_order):
+    apartment = await apartmentDB.get_apartment(name)
+    freeCalendar = []
+    dateCalenders = apartment["dateCalendars"]
+    deltaTime = apartment["deltaTime"]
+    considerTime = apartment["openTime"]
+    closeTime = apartment["closeTime"]
+    timeBusyIndex = 0
+    day_order = month_order+"/"+date_order+ "/" + year_order
+    while closeTime - considerTime >= deltaTime:
+        freeCalendar.append(considerTime)
+        considerTime += deltaTime
+    for dateIndex in range(len(dateCalenders)):
+        date = dateCalenders[dateIndex]
+        if (date["date"]) == day_order:
+            for busyTime in date["startTimes"]:
+                freeCalendar.remove(busyTime)
+            break
+            
+    
+    return {
+        "free_calendar": freeCalendar
+    }

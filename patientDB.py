@@ -39,7 +39,7 @@ async def add_patient(patient_data: dict) -> dict:
 async def retrieve_patient(id: str) -> dict:
     patient = await patient_collection.find_one({"_id": ObjectId(id)})
     if patient:
-        return patient_collection(patient)
+        return patient_helper(patient)
 
 
 # Update a patient with a matching ID

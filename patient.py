@@ -8,9 +8,10 @@ class PatientSchema(BaseModel):
     phoneNumber: int = Field(...)
     gender: str = Field(...)
     piority: bool = Field(...)
-    startAppointmentTime: datetime.datetime = Field(...)
-    durationOfAppointment: int = Field(...)
-
+    startAppointmentTime: float = Field(...)
+    appointmentDate: str = Field(...)
+    durationOfAppointment: float = Field(...)
+    apartmentName: str = Field(...)
     class Config:
         schema_extra = {
             "example": {
@@ -18,8 +19,10 @@ class PatientSchema(BaseModel):
                 "phoneNumber": 412323,
                 "gender": "male",
                 "piority": True,
-                "startAppointmentTime": datetime.datetime(2018, 6, 1),
-                "durationOfAppointment": 30,
+                "startAppointmentTime": 9,
+                "appointmentDate": datetime.datetime(2018, 6, 1).strftime("%m/%d/%Y"),
+                "durationOfAppointment": 1,
+                "apartmentName": "ngoai khoa",
             }
         }
 class UpdatePatientModel(BaseModel):
@@ -27,8 +30,10 @@ class UpdatePatientModel(BaseModel):
     phoneNumber: Optional[int]
     gender: Optional[str]
     piority: Optional[bool]
-    startAppointmentTime: Optional[datetime.datetime]
-    durationOfAppointment: Optional[int]
+    startAppointmentTime: Optional[float]
+    appointmentDate: Optional[str]
+    durationOfAppointment: Optional[float]
+    apartmentName: Optional[str]
     class Config:
         schema_extra = {
             "example": {
@@ -36,8 +41,10 @@ class UpdatePatientModel(BaseModel):
                 "phoneNumber": 412323,
                 "gender": "male",
                 "piority": True,
-                "startAppointmentTime": datetime.datetime(2018, 6, 1),
-                "durationOfAppointment": 30,
+                "startAppointmentTime": 9,
+                "appointmentDate": datetime.datetime(2018, 6, 1).strftime("%m/%d/%Y"),
+                "durationOfAppointment": 1,
+                "apartmentName": "ngoai khoa",
             }
         }
 def ResponseModel(data, message):
