@@ -24,7 +24,43 @@ async def add_apartment(apartment_data: dict) -> dict:
     new_apartment = await apartment_collection.find_one({"_id": apartments.inserted_id})
     return apartment_helper(new_apartment)
 
-async def get_lis_free_appartment(apartment_name):
+async def get_lis_free_appartment_this_week(apartment_name):
+    apartment = await apartment_collection.find_one({"name": apartment_name})
+    if apartment:
+        today = datetime.datetime.now()
+        weekDay = today+ datetime.timedelta(days= 6 - today.weekday())
+        format = "%m/%d/%Y"
+        deltaTime = apartment["deltaTime"]
+        ListFreeDay = []
+        FreeDay = {}
+        status = False
+        for dateIndex in range(len(apartment["dateCalendars"])):
+            FreeDay = {}
+            date = apartment["dateCalendars"][dateIndex]
+            day = date["date"]
+            if datetime.datetime.strptime(day,format) < today:
+                continue
+            order = date["orderInWeek"]
+            ListStartTime = date["startTimes"]
+            sizeOfListStartTime = len(ListStartTime)
+            print(datetime.datetime.strptime(day,format).strftime("%A"))
+            print(weekDay.strftime("%A"))
+            if datetime.datetime.strptime(day,format) < weekDay:
+                if sizeOfListStartTime < (apartment["closeTime"] - apartment["openTime"])/deltaTime:
+                    status = True
+                    FreeDay["date"] = day
+                    FreeDay["order"] = order
+                    ListFreeDay.append(FreeDay)
+            else:
+                break
+        return {
+            "FreeStatus": status,
+            "ListFreeDay": ListFreeDay,
+        }
+    else:
+        return "Can not find apartment"
+
+async def get_lis_free_appartment_next_week(apartment_name):
     apartment = await apartment_collection.find_one({"name": apartment_name})
     if apartment:
         today = datetime.datetime.now()
@@ -38,39 +74,38 @@ async def get_lis_free_appartment(apartment_name):
         for dateIndex in range(len(apartment["dateCalendars"])):
             date = apartment["dateCalendars"][dateIndex]
             day = date["date"]
+            if datetime.datetime.strptime(day,format) < today:
+                continue
             order = date["orderInWeek"]
             ListStartTime = date["startTimes"]
             sizeOfListStartTime = len(ListStartTime)
-            print(datetime.datetime.strptime(day,format).strftime("%A"))
-            print(weekDay.strftime("%A"))
-            if datetime.datetime.strptime(day,format).strftime("%A") != weekDay.strftime("%A"):
+            if datetime.datetime.strptime(day,format) < weekDay:
+                pass
+            else:
+                break
+        firstIndexInNextWeek = dateIndex + 1
+        for dateIndex in range(firstIndexInNextWeek,len(apartment["dateCalendars"])):
+            FreeDay = {}
+            date = apartment["dateCalendars"][dateIndex]
+            day = date["date"]
+            order = date["orderInWeek"]
+            ListStartTime = date["startTimes"]
+            sizeOfListStartTime = len(ListStartTime)
+            if datetime.datetime.strptime(day,format).strftime("%A") != nextWeekDay.strftime("%A"):
                 if sizeOfListStartTime < (apartment["closeTime"] - apartment["openTime"])/deltaTime:
                     status = True
                     FreeDay["date"] = day
                     FreeDay["order"] = order
+                    print(FreeDay)
                     ListFreeDay.append(FreeDay)
             else:
                 break
-        if status == False:
-            firstIndexInNextWeek = dateIndex + 1
-            for dateIndex in range(firstIndexInNextWeek,len(apartment["dateCalendars"])):
-                date = apartment["dateCalendars"][dateIndex]
-                day = date["date"]
-                order = date["orderInWeek"]
-                ListStartTime = date["startTimes"]
-                sizeOfListStartTime = len(ListStartTime)
-                if datetime.datetime.strptime(day,format).strftime("%A") != nextWeekDay.strftime("%A"):
-                    if sizeOfListStartTime < (apartment["closeTime"] - apartment["openTime"])/deltaTime:
-                        status = True
-                        FreeDay["date"] = day
-                        FreeDay["order"] = order
-                        ListFreeDay.append(FreeDay)
-                else:
-                    break
         return {
             "FreeStatus": status,
             "ListFreeDay": ListFreeDay,
         }
+    else:
+        return "Can not find apartment"
 
 async def get_apartment(apartment_name):
     apartment = await  apartment_collection.find_one({"name":apartment_name})

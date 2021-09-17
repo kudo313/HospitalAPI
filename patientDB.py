@@ -17,7 +17,8 @@ def patient_helper(patient) -> dict:
         "phoneNumber": str(patient["phoneNumber"]),
         "piority": patient["piority"],
         "startAppointmentTime": str(patient["startAppointmentTime"]),
-        "durationOfAppointment": str(patient["durationOfAppointment"]),
+        "appointmentDate": patient["appointmentDate"],
+        "apartmentName": patient["apartmentName"],
     }
 
 # Retrieve all patients present in the database

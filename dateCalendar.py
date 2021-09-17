@@ -10,7 +10,7 @@ class DateCalendarSchema(BaseModel):
     class Config:
         schema_extra = {
             "example": {
-                "date": datetime.datetime(2021, 9, 11).strftime("%m/%d/%Y"),
+                "date": datetime.datetime.now().strftime("%m/%d/%Y"),
                 "orderInWeek": 2,
                 "startTimes": []
             }

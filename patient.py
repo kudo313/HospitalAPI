@@ -10,7 +10,6 @@ class PatientSchema(BaseModel):
     piority: bool = Field(...)
     startAppointmentTime: float = Field(...)
     appointmentDate: str = Field(...)
-    durationOfAppointment: float = Field(...)
     apartmentName: str = Field(...)
     class Config:
         schema_extra = {
@@ -20,8 +19,7 @@ class PatientSchema(BaseModel):
                 "gender": "male",
                 "piority": True,
                 "startAppointmentTime": 9,
-                "appointmentDate": datetime.datetime(2018, 6, 1).strftime("%m/%d/%Y"),
-                "durationOfAppointment": 1,
+                "appointmentDate": datetime.datetime.now().strftime("%m/%d/%Y"),
                 "apartmentName": "ngoai khoa",
             }
         }
@@ -32,7 +30,6 @@ class UpdatePatientModel(BaseModel):
     piority: Optional[bool]
     startAppointmentTime: Optional[float]
     appointmentDate: Optional[str]
-    durationOfAppointment: Optional[float]
     apartmentName: Optional[str]
     class Config:
         schema_extra = {
@@ -42,8 +39,7 @@ class UpdatePatientModel(BaseModel):
                 "gender": "male",
                 "piority": True,
                 "startAppointmentTime": 9,
-                "appointmentDate": datetime.datetime(2018, 6, 1).strftime("%m/%d/%Y"),
-                "durationOfAppointment": 1,
+                "appointmentDate": datetime.datetime.now().strftime("%m/%d/%Y"),
                 "apartmentName": "ngoai khoa",
             }
         }

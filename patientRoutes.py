@@ -8,7 +8,7 @@ import apartmentDB
 
 router = APIRouter()
 
-@router.post("/patient/{apartment_name}", response_description="Patient data added into the database")
+@router.post("/patient", response_description="Patient data added into the database")
 async def add_student_data(patient: pt.PatientSchema = Body(...)):
     patient = jsonable_encoder(patient)
     updateStatus = False
@@ -31,9 +31,13 @@ async def add_apartment_data(apartment: ap.ApartmentCalendarSchema = Body(...)):
     new_apartment= await apartmentDB.add_apartment(apartment)
     return pt.ResponseModel(new_apartment, "Apartment added successfully.")
 
-@router.get("/apartment/{name}", response_description="get apartment from the database")
+@router.get("/apartment/this_week/{name}", response_description="Get free day of apartment in this week")
 async def get_all(name):
-    return await apartmentDB.get_lis_free_appartment(name)
+    return await apartmentDB.get_lis_free_appartment_this_week(name)
+
+@router.get("/apartment/next_week/{name}", response_description="Get free day of apartment in next week")
+async def get_all(name):
+    return await apartmentDB.get_lis_free_appartment_next_week(name)
 
 @router.get("/apartment/{name}/{date_order}/{month_order}/{year_order}", response_description=" get free calendar in a day")
 async def get_free_calendar(name, date_order, month_order, year_order):
@@ -48,10 +52,12 @@ async def get_free_calendar(name, date_order, month_order, year_order):
     while closeTime - considerTime >= deltaTime:
         freeCalendar.append(considerTime)
         considerTime += deltaTime
+    print(freeCalendar)
     for dateIndex in range(len(dateCalenders)):
         date = dateCalenders[dateIndex]
         if (date["date"]) == day_order:
             for busyTime in date["startTimes"]:
+                print(type(busyTime))
                 freeCalendar.remove(busyTime)
             break
             
